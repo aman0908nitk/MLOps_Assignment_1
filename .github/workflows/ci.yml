@@ -1,0 +1,36 @@
+name: Continuous Integration Workflow
+
+on:
+  push:
+    branches:
+      - kernelridge
+
+jobs:
+  validate-and-test:
+    name: Model Ingestion and Executing mse test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository Code Base
+        uses: actions/checkout@v5
+
+      - name: Configure Python Runtime Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # Leverages cache to speed up dependency installation
+
+      - name: Install Defined Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute Decision Tree Regression Pipeline
+        run: |
+          echo "==== STARTING DECISION TREE REGRESSOR ===="
+          python train.py
+
+      - name: Execute Kernel Ridge Regression Pipeline
+        run: |
+          echo "==== STARTING KERNEL RIDGE REGRESSOR ===="
+          python train2.py
