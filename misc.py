@@ -25,7 +25,16 @@ def load_data():
     return df
 
 def preprocess_data(df, target_column='MEDV', test_size=0.25, random_state=42, scale=False):
+    # FIX: If df is a NumPy array, convert it back to a DataFrame so .drop() works
+    if isinstance(df, np.ndarray):
+        # If no column names exist, create default integer or string column names
+        # Assuming the last column is the target if 'MEDV' isn't explicitly a string column
+        cols = [f"col_{i}" for i in range(df.shape[1])]
+        if target_column == 'MEDV' and 'MEDV' not in cols:
+            target_column = cols[-1] # Fallback to the last column
+        df = pd.DataFrame(df, columns=cols)
    
+    # Split features and target
     X = df.drop(columns=[target_column])
     y = df[target_column]
     
@@ -41,9 +50,12 @@ def preprocess_data(df, target_column='MEDV', test_size=0.25, random_state=42, s
         X_train_processed = scaler.fit_transform(X_train)
         # Apply the learned parameters to scale the test partition
         X_test_processed = scaler.transform(X_test)
-        return X_train_processed, X_test_processed, y_train, y_test
         
-    return X_train.values, X_test.values, y_train, y_test
+        # Consistently return y values as numpy arrays or pandas series
+        return X_train_processed, X_test_processed, y_train.values, y_test.values
+        
+    # FIX: Ensure y is also returned as a .values array for structural consistency
+    return X_train.values, X_test.values, y_train.values, y_test.values
 
 def train_model(model_instance, X_train, y_train):
     
