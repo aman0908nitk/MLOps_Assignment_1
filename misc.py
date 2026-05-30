@@ -9,7 +9,7 @@ def load_data():
     """Fetches the raw Boston Housing dataset from the given url"""
     
     data_url = "http://lib.stat.cmu.edu/datasets/boston"
-    raw_df = pd.read_csv(data_url, sep="\s+", skiprows=22, header=None)
+    raw_df = pd.read_csv(data_url, sep=r"\s+", skiprows=22, header=None)
     
     # Splitting this into data and target
     data = np.hstack([raw_df.values[::2, :], raw_df.values[1::2, :2]])
@@ -21,7 +21,7 @@ def load_data():
     
     # Creating dataframe
     df = pd.DataFrame(data, columns=feature_names)
-    df = target  # MEDV is our target variable
+    df['MEDV'] = target  # MEDV is our target variable
     return df
 
 def preprocess_data(df, target_column='MEDV', test_size=0.25, random_state=42, scale=False):
